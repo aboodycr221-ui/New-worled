@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>موقع المزاد</title>
+  <style>
+    body{font-family:Arial;background:#f5f7fa;margin:0;direction:rtl}
+    header{background:#1e90ff;color:#fff;padding:15px;text-align:center}
+    .container{max-width:900px;margin:auto;padding:15px}
+    .card{background:#fff;border-radius:10px;padding:15px;margin-bottom:15px;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+    input,button{width:100%;padding:10px;margin:5px 0;border-radius:6px;border:1px solid #ccc}
+    button{background:#1e90ff;color:#fff;border:none;cursor:pointer}
+    button:hover{background:#187bcd}
+    img{max-width:100%;border-radius:10px}
+    .bids{margin-top:10px}
+    .bid-item{background:#f1f1f1;padding:8px;border-radius:5px;margin-bottom:5px}
+    .timer{font-size:18px;color:#e74c3c;text-align:center;margin-top:10px}
+    .ended{color:green;font-weight:bold;text-align:center}
+    .whatsapp{background:#25d366;margin-top:10px}
+  </style>
+</head>
+<body>
+<header>
+  <h1>موقع التسعير بنظام المزاد</h1>
+</header>
+
+<div class="container">
+
+  <!-- إنشاء مزاد جديد -->
+  <div class="card">
+    <h2>إنشاء مزاد</h2>
+    <input type="file" id="itemImage">
+    <input type="number" id="startPrice" placeholder="سعر البداية">
+    <button onclick="createAuction()">بدء المزاد</button>
+  </div>
+
+  <!-- عرض المزاد -->
+  <div class="card" id="auction" style="display:none">
+    <h2>المزاد الحالي</h2>
+    <img id="preview">
+    <p>أعلى سعر: <span id="currentPrice"></span> جنيه</p>
+    <input type="number" id="bidPrice" placeholder="اكتب سعرك">
+    <button onclick="placeBid()">إضافة سعر</button>
+    <div class="timer" id="timer"></div>
+    <div class="bids" id="bids"></div>
+    <p class="ended" id="ended"></p>
+  </div>
+
+  <!-- بيانات الفائز والتواصل -->
+  <div class="card" id="contact" style="display:none">
+    <h2>بيانات التواصل</h2>
+    <input type="text" id="name" placeholder="الاسم">
+    <input type="text" id="address" placeholder="العنوان">
+    <input type="tel" id="phone" placeholder="رقم الهاتف">
+    <a id="whatsappLink" target="_blank"><button class="whatsapp">التواصل عبر واتساب</button></a>
+  </div>
+
+</div>
+
+<script>
+  let currentPrice = 0;
+  let countdown;
+  let timeLeft = 0;
+
+  function createAuction(){
+    const imgInput = document.getElementById('itemImage');
+    const priceInput = document.getElementById('startPrice').value;
+    if(!imgInput.files[0] || !priceInput){alert('أدخل الصورة وسعر البداية');return;}
+    currentPrice = Number(priceInput);
+    document.getElementById('currentPrice').innerText = currentPrice;
+    const reader = new FileReader();
+    reader.onload = () => document.getElementById('preview').src = reader.result;
+    reader.readAsDataURL(imgInput.files[0]);
+    document.getElementById('auction').style.display='block';
+  }
+
+  function placeBid(){
+    const bid = Number(document.getElementById('bidPrice').value);
+    if(bid <= currentPrice){alert('السعر لازم يكون أعلى');return;}
+    currentPrice = bid;
+    document.getElementById('currentPrice').innerText = currentPrice;
+    const div = document.createElement('div');
+    div.className='bid-item';
+    div.innerText = 'سعر جديد: ' + bid + ' جنيه';
+    document.getElementById('bids').prepend(div);
+    startTimer();
+  }
+
+  function startTimer(){
+    clearInterval(countdown);
+    timeLeft = 3;
+    document.getElementById('timer').innerText = timeLeft;
+    countdown = setInterval(()=>{
+      timeLeft--;
+      document.getElementById('timer').innerText = timeLeft;
+      if(timeLeft === 0){
+        clearInterval(countdown);
+        endAuction();
+      }
+    },1000);
+  }
+
+  function endAuction(){
+    document.getElementById('ended').innerText = 'انتهى المزاد على سعر ' + currentPrice + ' جنيه';
+    document.getElementById('contact').style.display='block';
+    const phone = '201234567890'; // رقم واتساب
+    document.getElementById('whatsappLink').href = `https://wa.me/${phone}?text=تم الفوز بالمزاد بسعر ${currentPrice}`;
+  }
+</script>
+
+</body>
+</html>
