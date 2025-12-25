@@ -1,199 +1,167 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>مزاد علني – تصميم مضيء</title>
+<meta charset="UTF-8">
+<title>مزاد علني مباشر</title>
 
-  <style>
-    :root{
-      --bg-dark:#020617;
-      --card-dark:rgba(2,6,23,.88);
-      --blue:#38bdf8;
-      --green:#22c55e;
-      --purple:#a78bfa;
-      --text:#e5e7eb;
-    }
-
-    *{box-sizing:border-box}
-
-    body{
-      margin:0;
-      font-family:Arial, sans-serif;
-      background:radial-gradient(circle at top, #020617, #000000);
-      color:var(--text);
-      min-height:100vh;
-    }
-
-    header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:16px 22px;
-      background:rgba(2,6,23,.95);
-      box-shadow:0 0 25px rgba(56,189,248,.25);
-    }
-
-    .badge{
-      padding:8px 18px;
-      border-radius:999px;
-      background:rgba(34,197,94,.15);
-      color:var(--green);
-      font-weight:bold;
-      box-shadow:0 0 18px rgba(34,197,94,.9);
-    }
-
-    .container{
-      max-width:900px;
-      margin:auto;
-      padding:24px;
-    }
-
-    .card{
-      background:var(--card-dark);
-      border-radius:22px;
-      padding:22px;
-      margin-bottom:22px;
-      box-shadow:0 0 25px rgba(56,189,248,.18), inset 0 0 15px rgba(167,139,250,.08);
-      backdrop-filter:blur(6px);
-    }
-
-    h3{margin-top:0;color:var(--blue)}
-
-    .user{
-      display:flex;
-      align-items:center;
-      gap:14px;
-    }
-
-    .user img{
-      width:56px;
-      height:56px;
-      border-radius:50%;
-      object-fit:cover;
-      box-shadow:0 0 18px rgba(56,189,248,1);
-    }
-
-    #countdown{
-      text-align:center;
-      font-size:44px;
-      color:var(--purple);
-      text-shadow:0 0 28px rgba(167,139,250,1);
-      margin:14px 0;
-    }
-
-    button{
-      width:100%;
-      padding:15px;
-      border:none;
-      border-radius:20px;
-      background:linear-gradient(135deg, var(--blue), var(--purple));
-      color:#020617;
-      font-size:18px;
-      font-weight:bold;
-      cursor:pointer;
-      box-shadow:0 0 28px rgba(56,189,248,1);
-      transition:.3s ease;
-    }
-
-    button:hover{
-      transform:scale(1.05);
-      box-shadow:0 0 40px rgba(167,139,250,1);
-    }
-
-    button:disabled{
-      background:#1e293b;
-      color:#64748b;
-      box-shadow:none;
-      cursor:not-allowed;
-    }
-
-    .notify{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      background:rgba(34,197,94,.12);
-      padding:12px;
-      border-radius:18px;
-      margin-top:10px;
-      box-shadow:0 0 20px rgba(34,197,94,.9);
-      animation:fade 4s forwards;
-    }
-
-    @keyframes fade{
-      0%{opacity:1}
-      80%{opacity:1}
-      100%{opacity:0}
-    }
-  </style>
+<style>
+body{margin:0;font-family:Arial;background:#020617;color:#e5e7eb}
+header{padding:16px;background:#020617;display:flex;justify-content:space-between}
+.container{max-width:900px;margin:auto;padding:20px}
+.card{background:#020617;border-radius:18px;padding:16px;margin-bottom:16px;
+box-shadow:0 0 20px rgba(56,189,248,.25)}
+h3{color:#38bdf8}
+input,button{width:100%;padding:12px;margin-top:8px;border-radius:12px;border:none}
+button{background:#38bdf8;font-weight:bold;cursor:pointer}
+button:disabled{background:#1e293b;color:#64748b}
+#chat{max-height:250px;overflow:auto}
+.msg{background:#020617;padding:8px;border-radius:10px;margin-bottom:6px}
+#countdown{font-size:32px;text-align:center;color:#a78bfa}
+img{max-width:100%;border-radius:16px;margin-top:10px}
+</style>
 </head>
+
 <body>
 
 <header>
-  <div>✨ مزاد علني مباشر</div>
-  <div class="badge">المنضمين: <span id="usersCount">1</span></div>
+  <div>🔥 مزاد مباشر</div>
+  <div>المتواجدين: <span id="users">1</span></div>
 </header>
 
 <div class="container">
 
-  <div class="card">
-    <h3>بدأ المزاد بواسطة</h3>
-    <div class="user">
-      <img src="https://i.pravatar.cc/150?img=12">
-      <strong>صاحب المزاد</strong>
-    </div>
-  </div>
+<div class="card">
+  <h3>إنشاء مزاد (صاحب المزاد فقط)</h3>
+  <input type="file" id="imageInput">
+  <input type="number" id="startPrice" placeholder="سعر البداية">
+  <button onclick="createAuction()">بدء المزاد</button>
+  <div id="countdown"></div>
+  <img id="auctionImg">
+</div>
 
-  <div class="card">
-    <h3>بداية المزاد خلال</h3>
-    <div id="countdown">3</div>
-    <button id="startBtn" disabled>المزاد بدأ</button>
-  </div>
+<div class="card">
+  <button id="endBtn" onclick="endAuction()" disabled>إنهاء المزاد</button>
+</div>
 
-  <div class="card">
-    <h3>إشعارات الدخول</h3>
-    <div id="notifications"></div>
-  </div>
+<div class="card">
+  <h3>الشات / المزايدات</h3>
+  <div id="chat"></div>
+  <input id="msgInput" placeholder="اكتب رسالة أو مزايدة">
+  <button onclick="sendMsg()">إرسال</button>
+</div>
 
 </div>
 
-<script>
-  const currentUser = {
-    name: 'مستخدم جديد',
-    img: 'https://i.pravatar.cc/150?img=' + Math.floor(Math.random()*70)
-  };
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc, updateDoc }
+from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getAuth, signInAnonymously }
+from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { getStorage, ref, uploadBytes, getDownloadURL }
+from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 
-  let usersCount = 1;
-  const usersCountEl = document.getElementById('usersCount');
+const firebaseConfig = {
+  apiKey: "PUT_YOUR_KEY",
+  authDomain: "PUT_YOUR_DOMAIN",
+  projectId: "PUT_PROJECT_ID",
+  storageBucket: "PUT_BUCKET",
+  messagingSenderId: "PUT_ID",
+  appId: "PUT_APP_ID"
+};
 
-  function notifyJoin(user){
-    usersCount++;
-    usersCountEl.textContent = usersCount;
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const storage = getStorage(app);
 
-    const div = document.createElement('div');
-    div.className = 'notify';
-    div.innerHTML = `<img src="${user.img}" width="42" style="border-radius:50%;box-shadow:0 0 12px #22c55e"> <span>${user.name} انضم للمزاد</span>`;
-    document.getElementById('notifications').prepend(div);
+let uid=null;
+let auctionActive=false;
+let lastPrice=0;
+const auctionRef = doc(db,"auction","main");
+
+signInAnonymously(auth).then(res=>{
+  uid=res.user.uid;
+});
+
+onSnapshot(collection(db,"chat"),snap=>{
+  chat.innerHTML="";
+  snap.forEach(d=>{
+    const m=document.createElement("div");
+    m.className="msg";
+    m.textContent=d.data().text;
+    chat.appendChild(m);
+  });
+  chat.scrollTop=9999;
+});
+
+onSnapshot(auctionRef,docSnap=>{
+  if(!docSnap.exists()) return;
+  const d=docSnap.data();
+  auctionActive=d.active;
+  lastPrice=d.lastPrice;
+  if(d.image){
+    auctionImg.src=d.image;
+  }
+  endBtn.disabled = uid!==d.owner || !auctionActive;
+});
+
+window.sendMsg=async()=>{
+  const val=msgInput.value;
+  if(!val) return;
+
+  if(auctionActive && !isNaN(val)){
+    if(Number(val)<=lastPrice) return alert("لازم أعلى");
+    await updateDoc(auctionRef,{lastPrice:Number(val)});
   }
 
-  let time = 3;
-  function startCountdown(){
-    const el = document.getElementById('countdown');
-    const interval = setInterval(()=>{
-      time--;
-      el.textContent = time;
-      if(time === 0){
-        clearInterval(interval);
-        el.textContent = 'المزاد بدأ';
-        document.getElementById('startBtn').disabled = false;
-      }
-    },1000);
-  }
+  await addDoc(collection(db,"chat"),{text:val,time:Date.now()});
+  msgInput.value="";
+};
 
-  window.onload = ()=>{
-    notifyJoin(currentUser);
-    startCountdown();
-  };
+window.createAuction=async()=>{
+  const file=imageInput.files[0];
+  const price=Number(startPrice.value);
+  if(!file||!price) return alert("الصورة والسعر مطلوبين");
+
+  const r=ref(storage,"auction.jpg");
+  await uploadBytes(r,file);
+  const url=await getDownloadURL(r);
+
+  await setDoc(auctionRef,{
+    owner:uid,
+    image:url,
+    active:false,
+    lastPrice:price
+  });
+
+  startCountdown(3,async()=>{
+    await updateDoc(auctionRef,{active:true});
+    await addDoc(collection(db,"chat"),{text:"🚀 المزاد بدأ"});
+  });
+};
+
+window.endAuction=()=>{
+  startCountdown(15,async()=>{
+    await updateDoc(auctionRef,{active:false});
+    await addDoc(collection(db,"chat"),
+    {text:"🏆 انتهى المزاد — السعر النهائي: "+lastPrice});
+  });
+};
+
+function startCountdown(sec,cb){
+  countdown.textContent=sec;
+  const i=setInterval(()=>{
+    sec--;
+    countdown.textContent=sec;
+    if(sec===0){
+      clearInterval(i);
+      countdown.textContent="";
+      cb();
+    }
+  },1000);
+}
 </script>
 
 </body>
