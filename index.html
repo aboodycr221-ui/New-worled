@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>موقع المزاد</title>
+
+<style>
+body{
+  font-family:Arial;
+  background:#f5f7fa;
+  margin:0;
+  direction:rtl;
+}
+header{
+  background:#1e90ff;
+  color:#fff;
+  padding:15px;
+  text-align:center;
+}
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:15px;
+}
+.card{
+  background:#fff;
+  border-radius:10px;
+  padding:15px;
+  margin-bottom:15px;
+  box-shadow:0 4px 10px rgba(0,0,0,.1);
+}
+input,button{
+  width:100%;
+  padding:10px;
+  margin:5px 0;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+button{
+  background:#1e90ff;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+}
+button:hover{background:#187bcd}
+img{
+  width:1700px;
+  height:920px;
+  max-width:100%;
+  object-fit:cover;
+  border-radius:10px;
+}
+.timer{
+  font-size:20px;
+  color:#e74c3c;
+  text-align:center;
+}
+.bid-item{
+  background:#f1f1f1;
+  padding:8px;
+  border-radius:5px;
+  margin-bottom:5px;
+}
+.chat-box{
+  height:200px;
+  overflow-y:auto;
+  border:1px solid #ccc;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:6px;
+  background:#fafafa;
+}
+.chat-msg{
+  margin-bottom:5px;
+}
+.whatsapp{
+  background:#25d366;
+}
+.ended{
+  color:green;
+  font-weight:bold;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>موقع التسعير بنظام المزاد</h1>
+</header>
+
+<div class="container">
+
+<!-- تسجيل الانضمام -->
+<div class="card" id="joinCard">
+  <h2>الانضمام للمزاد</h2>
+  <input type="text" id="username" placeholder="اسمك">
+  <button onclick="joinAuction()">انضم</button>
+  <p id="joinStatus"></p>
+</div>
+
+<!-- إنشاء مزاد -->
+<div class="card">
+  <h2>إنشاء مزاد</h2>
+  <input type="file" id="itemImage">
+  <input type="number" id="startPrice" placeholder="سعر البداية">
+  <button onclick="createAuction()">بدء المزاد</button>
+</div>
+
+<!-- المزاد -->
+<div class="card" id="auction" style="display:none">
+  <h2>المزاد الحالي</h2>
+  <img id="preview">
+  <p>أعلى سعر: <span id="currentPrice"></span> جنيه</p>
+  <input type="number" id="bidPrice" placeholder="اكتب سعرك">
+  <button onclick="placeBid()">إضافة سعر</button>
+  <div class="timer" id="timer"></div>
+  <div id="bids"></div>
+  <p class="ended" id="ended"></p>
+</div>
+
+<!-- الشات -->
+<div class="card" id="chat" style="display:none">
+  <h2>شات المزاد</h2>
+  <div class="chat-box" id="chatBox"></div>
+  <input type="text" id="chatInput" placeholder="اكتب رسالة">
+  <button onclick="sendMessage()">إرسال</button>
+</div>
+
+<!-- التواصل -->
+<div class="card" id="contact" style="display:none">
+  <h2>بيانات الفائز</h2>
+  <a id="whatsappLink" target="_blank">
+    <button class="whatsapp">التواصل عبر واتساب</button>
+  </a>
+</div>
+
+</div>
+
+<script>
+let currentPrice = 0;
+let timeLeft = 0;
+let countdown;
+let currentUser = '';
+let participants = [];
+
+/* الانضمام */
+function joinAuction(){
+  const name = document.getElementById('username').value.trim();
+  if(!name){ alert('اكتب اسمك'); return; }
+  currentUser = name;
+  participants.push(name);
+  document.getElementById('joinStatus').innerText =
+    'تم الانضمام باسم: ' + name;
+  document.getElementById('chat').style.display = 'block';
+}
+
+/* إنشاء المزاد */
+function createAuction(){
+  const img = document.getElementById('itemImage').files[0];
+  const price = document.getElementById('startPrice').value;
+  if(!img || !price){ alert('أدخل الصورة وسعر البداية'); return; }
+
+  currentPrice = Number(price);
+  document.getElementById('currentPrice').innerText = currentPrice;
+
+  const reader = new FileReader();
+  reader.onload = ()=> document.getElementById('preview').src = reader.result;
+  reader.readAsDataURL(img);
+
+  document.getElementById('auction').style.display='block';
+}
+
+/* إضافة سعر */
+function placeBid(){
+  if(!currentUser){ alert('لازم تنضم الأول'); return; }
+
+  const bid = Number(document.getElementById('bidPrice').value);
+  if(bid <= currentPrice){ alert('السعر أقل من الحالي'); return; }
+
+  currentPrice = bid;
+  document.getElementById('currentPrice').innerText = currentPrice;
+
+  const div = document.createElement('div');
+  div.className = 'bid-item';
+  div.innerText = currentUser + ' رفع السعر إلى ' + bid + ' جنيه';
+  document.getElementById('bids').prepend(div);
+
+  startTimer();
+}
+
+/* العداد */
+function startTimer(){
+  clearInterval(countdown);
+  timeLeft = 10;
+  document.getElementById('timer').innerText = timeLeft;
+
+  countdown = setInterval(()=>{
+    timeLeft--;
+    document.getElementById('timer').innerText = timeLeft;
+    if(timeLeft === 0){
+      clearInterval(countdown);
+      endAuction();
+    }
+  },1000);
+}
+
+/* إنهاء المزاد */
+function endAuction(){
+  document.getElementById('ended').innerText =
+    'انتهى المزاد على سعر ' + currentPrice + ' جنيه';
+
+  document.getElementById('contact').style.display='block';
+
+  const phone = '201271981601';
+  document.getElementById('whatsappLink').href =
+    `https://wa.me/${phone}?text=تم الفوز بالمزاد بسعر ${currentPrice} جنيه`;
+}
+
+/* الشات */
+function sendMessage(){
+  if(!currentUser){ return; }
+  const msg = document.getElementById('chatInput').value.trim();
+  if(!msg) return;
+
+  const div = document.createElement('div');
+  div.className='chat-msg';
+  div.innerText = currentUser + ': ' + msg;
+  document.getElementById('chatBox').appendChild(div);
+
+  document.getElementById('chatInput').value='';
+}
+</script>
+
+</body>
+</html>
