@@ -1,237 +1,199 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>موقع المزاد</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مزاد علني – تصميم مضيء</title>
 
-<style>
-body{
-  font-family:Arial;
-  background:#f5f7fa;
-  margin:0;
-  direction:rtl;
-}
-header{
-  background:#1e90ff;
-  color:#fff;
-  padding:15px;
-  text-align:center;
-}
-.container{
-  max-width:900px;
-  margin:auto;
-  padding:15px;
-}
-.card{
-  background:#fff;
-  border-radius:10px;
-  padding:15px;
-  margin-bottom:15px;
-  box-shadow:0 4px 10px rgba(0,0,0,.1);
-}
-input,button{
-  width:100%;
-  padding:10px;
-  margin:5px 0;
-  border-radius:6px;
-  border:1px solid #ccc;
-}
-button{
-  background:#1e90ff;
-  color:#fff;
-  border:none;
-  cursor:pointer;
-}
-button:hover{background:#187bcd}
-img{
-  width:1700px;
-  height:920px;
-  max-width:100%;
-  object-fit:cover;
-  border-radius:10px;
-}
-.timer{
-  font-size:20px;
-  color:#e74c3c;
-  text-align:center;
-}
-.bid-item{
-  background:#f1f1f1;
-  padding:8px;
-  border-radius:5px;
-  margin-bottom:5px;
-}
-.chat-box{
-  height:200px;
-  overflow-y:auto;
-  border:1px solid #ccc;
-  padding:10px;
-  margin-bottom:10px;
-  border-radius:6px;
-  background:#fafafa;
-}
-.chat-msg{
-  margin-bottom:5px;
-}
-.whatsapp{
-  background:#25d366;
-}
-.ended{
-  color:green;
-  font-weight:bold;
-  text-align:center;
-}
-</style>
+  <style>
+    :root{
+      --bg-dark:#020617;
+      --card-dark:rgba(2,6,23,.88);
+      --blue:#38bdf8;
+      --green:#22c55e;
+      --purple:#a78bfa;
+      --text:#e5e7eb;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:radial-gradient(circle at top, #020617, #000000);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:16px 22px;
+      background:rgba(2,6,23,.95);
+      box-shadow:0 0 25px rgba(56,189,248,.25);
+    }
+
+    .badge{
+      padding:8px 18px;
+      border-radius:999px;
+      background:rgba(34,197,94,.15);
+      color:var(--green);
+      font-weight:bold;
+      box-shadow:0 0 18px rgba(34,197,94,.9);
+    }
+
+    .container{
+      max-width:900px;
+      margin:auto;
+      padding:24px;
+    }
+
+    .card{
+      background:var(--card-dark);
+      border-radius:22px;
+      padding:22px;
+      margin-bottom:22px;
+      box-shadow:0 0 25px rgba(56,189,248,.18), inset 0 0 15px rgba(167,139,250,.08);
+      backdrop-filter:blur(6px);
+    }
+
+    h3{margin-top:0;color:var(--blue)}
+
+    .user{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .user img{
+      width:56px;
+      height:56px;
+      border-radius:50%;
+      object-fit:cover;
+      box-shadow:0 0 18px rgba(56,189,248,1);
+    }
+
+    #countdown{
+      text-align:center;
+      font-size:44px;
+      color:var(--purple);
+      text-shadow:0 0 28px rgba(167,139,250,1);
+      margin:14px 0;
+    }
+
+    button{
+      width:100%;
+      padding:15px;
+      border:none;
+      border-radius:20px;
+      background:linear-gradient(135deg, var(--blue), var(--purple));
+      color:#020617;
+      font-size:18px;
+      font-weight:bold;
+      cursor:pointer;
+      box-shadow:0 0 28px rgba(56,189,248,1);
+      transition:.3s ease;
+    }
+
+    button:hover{
+      transform:scale(1.05);
+      box-shadow:0 0 40px rgba(167,139,250,1);
+    }
+
+    button:disabled{
+      background:#1e293b;
+      color:#64748b;
+      box-shadow:none;
+      cursor:not-allowed;
+    }
+
+    .notify{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      background:rgba(34,197,94,.12);
+      padding:12px;
+      border-radius:18px;
+      margin-top:10px;
+      box-shadow:0 0 20px rgba(34,197,94,.9);
+      animation:fade 4s forwards;
+    }
+
+    @keyframes fade{
+      0%{opacity:1}
+      80%{opacity:1}
+      100%{opacity:0}
+    }
+  </style>
 </head>
-
 <body>
 
 <header>
-<h1>موقع التسعير بنظام المزاد</h1>
+  <div>✨ مزاد علني مباشر</div>
+  <div class="badge">المنضمين: <span id="usersCount">1</span></div>
 </header>
 
 <div class="container">
 
-<!-- تسجيل الانضمام -->
-<div class="card" id="joinCard">
-  <h2>الانضمام للمزاد</h2>
-  <input type="text" id="username" placeholder="اسمك">
-  <button onclick="joinAuction()">انضم</button>
-  <p id="joinStatus"></p>
-</div>
+  <div class="card">
+    <h3>بدأ المزاد بواسطة</h3>
+    <div class="user">
+      <img src="https://i.pravatar.cc/150?img=12">
+      <strong>صاحب المزاد</strong>
+    </div>
+  </div>
 
-<!-- إنشاء مزاد -->
-<div class="card">
-  <h2>إنشاء مزاد</h2>
-  <input type="file" id="itemImage">
-  <input type="number" id="startPrice" placeholder="سعر البداية">
-  <button onclick="createAuction()">بدء المزاد</button>
-</div>
+  <div class="card">
+    <h3>بداية المزاد خلال</h3>
+    <div id="countdown">3</div>
+    <button id="startBtn" disabled>المزاد بدأ</button>
+  </div>
 
-<!-- المزاد -->
-<div class="card" id="auction" style="display:none">
-  <h2>المزاد الحالي</h2>
-  <img id="preview">
-  <p>أعلى سعر: <span id="currentPrice"></span> جنيه</p>
-  <input type="number" id="bidPrice" placeholder="اكتب سعرك">
-  <button onclick="placeBid()">إضافة سعر</button>
-  <div class="timer" id="timer"></div>
-  <div id="bids"></div>
-  <p class="ended" id="ended"></p>
-</div>
-
-<!-- الشات -->
-<div class="card" id="chat" style="display:none">
-  <h2>شات المزاد</h2>
-  <div class="chat-box" id="chatBox"></div>
-  <input type="text" id="chatInput" placeholder="اكتب رسالة">
-  <button onclick="sendMessage()">إرسال</button>
-</div>
-
-<!-- التواصل -->
-<div class="card" id="contact" style="display:none">
-  <h2>بيانات الفائز</h2>
-  <a id="whatsappLink" target="_blank">
-    <button class="whatsapp">التواصل عبر واتساب</button>
-  </a>
-</div>
+  <div class="card">
+    <h3>إشعارات الدخول</h3>
+    <div id="notifications"></div>
+  </div>
 
 </div>
 
 <script>
-let currentPrice = 0;
-let timeLeft = 0;
-let countdown;
-let currentUser = '';
-let participants = [];
+  const currentUser = {
+    name: 'مستخدم جديد',
+    img: 'https://i.pravatar.cc/150?img=' + Math.floor(Math.random()*70)
+  };
 
-/* الانضمام */
-function joinAuction(){
-  const name = document.getElementById('username').value.trim();
-  if(!name){ alert('اكتب اسمك'); return; }
-  currentUser = name;
-  participants.push(name);
-  document.getElementById('joinStatus').innerText =
-    'تم الانضمام باسم: ' + name;
-  document.getElementById('chat').style.display = 'block';
-}
+  let usersCount = 1;
+  const usersCountEl = document.getElementById('usersCount');
 
-/* إنشاء المزاد */
-function createAuction(){
-  const img = document.getElementById('itemImage').files[0];
-  const price = document.getElementById('startPrice').value;
-  if(!img || !price){ alert('أدخل الصورة وسعر البداية'); return; }
+  function notifyJoin(user){
+    usersCount++;
+    usersCountEl.textContent = usersCount;
 
-  currentPrice = Number(price);
-  document.getElementById('currentPrice').innerText = currentPrice;
+    const div = document.createElement('div');
+    div.className = 'notify';
+    div.innerHTML = `<img src="${user.img}" width="42" style="border-radius:50%;box-shadow:0 0 12px #22c55e"> <span>${user.name} انضم للمزاد</span>`;
+    document.getElementById('notifications').prepend(div);
+  }
 
-  const reader = new FileReader();
-  reader.onload = ()=> document.getElementById('preview').src = reader.result;
-  reader.readAsDataURL(img);
+  let time = 3;
+  function startCountdown(){
+    const el = document.getElementById('countdown');
+    const interval = setInterval(()=>{
+      time--;
+      el.textContent = time;
+      if(time === 0){
+        clearInterval(interval);
+        el.textContent = 'المزاد بدأ';
+        document.getElementById('startBtn').disabled = false;
+      }
+    },1000);
+  }
 
-  document.getElementById('auction').style.display='block';
-}
-
-/* إضافة سعر */
-function placeBid(){
-  if(!currentUser){ alert('لازم تنضم الأول'); return; }
-
-  const bid = Number(document.getElementById('bidPrice').value);
-  if(bid <= currentPrice){ alert('السعر أقل من الحالي'); return; }
-
-  currentPrice = bid;
-  document.getElementById('currentPrice').innerText = currentPrice;
-
-  const div = document.createElement('div');
-  div.className = 'bid-item';
-  div.innerText = currentUser + ' رفع السعر إلى ' + bid + ' جنيه';
-  document.getElementById('bids').prepend(div);
-
-  startTimer();
-}
-
-/* العداد */
-function startTimer(){
-  clearInterval(countdown);
-  timeLeft = 10;
-  document.getElementById('timer').innerText = timeLeft;
-
-  countdown = setInterval(()=>{
-    timeLeft--;
-    document.getElementById('timer').innerText = timeLeft;
-    if(timeLeft === 0){
-      clearInterval(countdown);
-      endAuction();
-    }
-  },1000);
-}
-
-/* إنهاء المزاد */
-function endAuction(){
-  document.getElementById('ended').innerText =
-    'انتهى المزاد على سعر ' + currentPrice + ' جنيه';
-
-  document.getElementById('contact').style.display='block';
-
-  const phone = '201271981601';
-  document.getElementById('whatsappLink').href =
-    `https://wa.me/${phone}?text=تم الفوز بالمزاد بسعر ${currentPrice} جنيه`;
-}
-
-/* الشات */
-function sendMessage(){
-  if(!currentUser){ return; }
-  const msg = document.getElementById('chatInput').value.trim();
-  if(!msg) return;
-
-  const div = document.createElement('div');
-  div.className='chat-msg';
-  div.innerText = currentUser + ': ' + msg;
-  document.getElementById('chatBox').appendChild(div);
-
-  document.getElementById('chatInput').value='';
-}
+  window.onload = ()=>{
+    notifyJoin(currentUser);
+    startCountdown();
+  };
 </script>
 
 </body>
